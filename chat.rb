@@ -3,24 +3,38 @@ require "dotenv/load"
 
 client = OpenAI::Client.new(access_token: ENV.fetch("OPENAI_API_KEY"))
 
-# Prepare an Array of previous messages
-message_list = [
-  {
-    "role" => "system",
-    "content" => "You are a helpful assistant who talks like Shakespeare."
-  },
-  {
-    "role" => "user",
-    "content" => "Hello! What are the best spots for pizza in Chicago?"
-  }
-]
+puts "Hello, how can I help you today?"
 
-# Call the API to get the next message from GPT
-api_response = client.chat(
-  parameters: {
-    model: "gpt-3.5-turbo",
-    messages: message_list
-  }
-)
+puts "-"*50
 
-pp api_response
+input = ""
+
+message_list = []
+
+while input != "bye" do
+
+  input = gets.chomp
+  puts "-"*50
+
+  new_message = {"role" => "user", "content" => input}
+
+  message_list.append(new_message)
+
+  api_response = client.chat(
+    parameters: {
+      model: "gpt-3.5-turbo",
+      messages: message_list
+    }
+  )
+
+  response = api_response.fetch("choices")[0].fetch("message").fetch("content")
+
+  new_response = {"role" => "system", "content" => response}
+  
+  message_list.append(new_response)
+
+  puts response
+
+  puts "-"*50
+  
+end
